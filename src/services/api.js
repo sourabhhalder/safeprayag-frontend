@@ -1,8 +1,12 @@
 import axios from 'axios';
 
-const BASE = process.env.REACT_APP_API_URL || 'https://safeprayag-ap.onrender.com';
+const RAW_BASE = process.env.REACT_APP_API_URL || 'https://safeprayag-ap.onrender.com';
+const BASE = RAW_BASE.replace(/\/+$/, '');
 
-const api = axios.create({ baseURL: BASE });
+const api = axios.create({
+  baseURL: BASE,
+  headers: { 'Content-Type': 'application/json' },
+});
 
 api.interceptors.request.use(cfg => {
   const token = localStorage.getItem('sp_token');

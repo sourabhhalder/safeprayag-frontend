@@ -35,7 +35,11 @@ export default function Login() {
       // Use window.location for guaranteed redirect (bypasses any React Router edge cases)
       window.location.replace(from === '/login' ? '/dashboard' : from);
     } catch (e) {
-      const msg = e.response?.data?.detail || e.message || 'Login failed. Check your credentials.';
+      const msg =
+        e.response?.data?.detail ||
+        (e.response?.status === 503 ? 'Backend database is unavailable right now. Please try again shortly.' : '') ||
+        e.message ||
+        'Login failed. Check your credentials.';
       setErr(msg);
       setBusy(false);
     }
