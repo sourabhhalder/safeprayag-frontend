@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getDashboard, getExtraStats, reportIncident } from '../services/api';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, CartesianGrid, LineChart, Line,
+  PieChart, Pie, Cell, CartesianGrid,
   AreaChart, Area, Legend,
 } from 'recharts';
 
