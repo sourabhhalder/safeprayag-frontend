@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { triggerSOS } from '../services/api';
 
 const Logo = () => (
-  <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+  <Link to="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none' }}>
     <div style={{
-      width: 38, height: 38, borderRadius: 10,
-      background: 'linear-gradient(135deg, #FF3B5C, #7B2FBE)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 18, boxShadow: '0 0 16px rgba(255,59,92,0.4)',
+      width:38, height:38, borderRadius:10,
+      background:'linear-gradient(135deg, #FF3B5C, #7B2FBE)',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      fontSize:18, boxShadow:'0 0 16px rgba(255,59,92,0.4)',
     }}>🛡️</div>
     <div>
-      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 20, letterSpacing: 1, color: 'var(--text)', lineHeight: 1 }}>
-        SAFE<span style={{ color: 'var(--red)' }}>PRAYAG</span>
+      <div style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:20, letterSpacing:1, color:'var(--text)', lineHeight:1 }}>
+        SAFE<span style={{ color:'var(--red)' }}>PRAYAG</span>
       </div>
-      <div style={{ fontFamily: 'var(--font-cond)', fontSize: 10, letterSpacing: 2, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+      <div style={{ fontFamily:'var(--font-cond)', fontSize:10, letterSpacing:2, color:'var(--text-muted)', textTransform:'uppercase' }}>
         AI Safety Navigator
       </div>
     </div>
@@ -23,19 +24,20 @@ const Logo = () => (
 );
 
 const navStyle = ({ isActive }) => ({
-  fontFamily: 'var(--font-cond)', fontWeight: 600, fontSize: 13,
-  letterSpacing: '0.8px', textTransform: 'uppercase',
+  fontFamily:'var(--font-cond)', fontWeight:600, fontSize:13,
+  letterSpacing:'0.8px', textTransform:'uppercase',
   color: isActive ? 'var(--red)' : 'var(--text-2)',
-  textDecoration: 'none', padding: '6px 0',
+  textDecoration:'none', padding:'6px 0',
   borderBottom: isActive ? '2px solid var(--red)' : '2px solid transparent',
-  transition: 'all 0.2s',
+  transition:'all 0.2s',
 });
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
+  const { dark, toggle } = useTheme();
   const navigate  = useNavigate();
-  const [menuOpen, setMenuOpen]   = useState(false);
-  const [sosBusy,  setSosBusy]    = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [sosBusy,  setSosBusy]  = useState(false);
 
   const handleLogout = () => { logout(); navigate('/'); setMenuOpen(false); };
 
@@ -46,7 +48,7 @@ export default function Header() {
       async pos => {
         try {
           const res = await triggerSOS({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-          alert(`🆘 SOS TRIGGERED!\n${res.data.nearest_police.name}\n📞 ${res.data.nearest_police.phone}\nGuardian notified: ${res.data.guardian_notified ? 'Yes ✅' : 'No — add guardian phone in Profile'}`);
+          alert(`🆘 SOS TRIGGERED!\n${res.data.nearest_police.name}\n📞 ${res.data.nearest_police.phone}\nGuardian notified: ${res.data.guardian_notified ? 'Yes ✅' : 'No — add guardian in Profile'}`);
         } catch (e) {
           alert('SOS error: ' + (e.response?.data?.detail || e.message));
         } finally { setSosBusy(false); }
@@ -57,15 +59,17 @@ export default function Header() {
 
   return (
     <header style={{
-      background: 'rgba(13,13,26,0.97)', backdropFilter: 'blur(20px)',
-      borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 100,
+      background: dark ? 'rgba(13,13,26,0.97)' : 'rgba(255,255,255,0.97)',
+      backdropFilter:'blur(20px)',
+      borderBottom:'1px solid var(--border)',
+      position:'sticky', top:0, zIndex:100,
     }}>
-      <div className="container" style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+      <div className="container" style={{ height:64, display:'flex', alignItems:'center', justifyContent:'space-between', gap:16 }}>
         <Logo />
 
         {/* Desktop Nav */}
-        <nav style={{ display: 'flex', gap: 22, alignItems: 'center' }} className="desktop-nav">
-          <NavLink to="/"    style={navStyle} end>Home</NavLink>
+        <nav style={{ display:'flex', gap:22, alignItems:'center' }} className="desktop-nav">
+          <NavLink to="/"     style={navStyle} end>Home</NavLink>
           <NavLink to="/blog" style={navStyle}>Blog</NavLink>
           <NavLink to="/faq"  style={navStyle}>FAQ</NavLink>
           {isAuthenticated && <>
@@ -75,71 +79,87 @@ export default function Header() {
         </nav>
 
         {/* Right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+
+          {/* Theme Toggle */}
+          <button onClick={toggle} title={dark ? 'Switch to Light Mode' : 'Switch to Dark Mode'} style={{
+            width:36, height:36, borderRadius:8,
+            background:'var(--bg-card)', border:'1px solid var(--border)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            fontSize:16, cursor:'pointer', transition:'all 0.2s', flexShrink:0,
+          }}
+            onMouseEnter={e => e.currentTarget.style.borderColor='var(--red)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor='var(--border)'}
+          >
+            {dark ? '☀️' : '🌙'}
+          </button>
+
           {isAuthenticated && (
             <button onClick={handleQuickSOS} disabled={sosBusy} style={{
-              background: 'var(--red)', color: 'white', border: 'none',
-              borderRadius: 20, padding: '8px 18px',
-              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13,
-              letterSpacing: 1, cursor: 'pointer', animation: 'pulse-red 2s infinite',
-              opacity: sosBusy ? 0.7 : 1,
+              background:'var(--red)', color:'white', border:'none',
+              borderRadius:20, padding:'8px 18px',
+              fontFamily:'var(--font-display)', fontWeight:700, fontSize:13,
+              letterSpacing:1, cursor:'pointer', animation:'pulse-red 2s infinite',
+              opacity: sosBusy ? 0.7 : 1, flexShrink:0,
             }}>
               {sosBusy ? '…' : '🆘 SOS'}
             </button>
           )}
 
           {isAuthenticated ? (
-            <div style={{ position: 'relative' }}>
+            <div style={{ position:'relative' }}>
               <button onClick={() => setMenuOpen(!menuOpen)} style={{
-                background: 'var(--bg-card)', border: '1px solid var(--border)',
-                borderRadius: 20, padding: '6px 14px',
-                display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
-                fontFamily: 'var(--font-cond)', fontSize: 13, color: 'var(--text)',
+                background:'var(--bg-card)', border:'1px solid var(--border)',
+                borderRadius:20, padding:'6px 14px',
+                display:'flex', alignItems:'center', gap:8, cursor:'pointer',
+                fontFamily:'var(--font-cond)', fontSize:13, color:'var(--text)',
               }}>
                 <span style={{
-                  width: 26, height: 26, background: 'var(--violet)', borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 700,
+                  width:26, height:26, background:'var(--violet)', borderRadius:'50%',
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  fontSize:12, fontWeight:700, flexShrink:0,
                 }}>{user?.name?.charAt(0).toUpperCase() || 'U'}</span>
-                {user?.name?.split(' ')[0]}
-                <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>▾</span>
+                <span className="hide-mobile">{user?.name?.split(' ')[0]}</span>
+                <span style={{ color:'var(--text-muted)', fontSize:11 }}>▾</span>
               </button>
               {menuOpen && (
                 <div style={{
-                  position: 'absolute', right: 0, top: '110%',
-                  background: 'var(--bg-card)', border: '1px solid var(--border)',
-                  borderRadius: 10, minWidth: 180, boxShadow: 'var(--shadow)', zIndex: 200, overflow: 'hidden',
+                  position:'absolute', right:0, top:'110%',
+                  background:'var(--bg-card)', border:'1px solid var(--border)',
+                  borderRadius:10, minWidth:180, boxShadow:'var(--shadow)', zIndex:200, overflow:'hidden',
                 }}>
                   {[
-                    { label: '👤  Profile',       to: '/profile'   },
-                    { label: '📊  Dashboard',     to: '/dashboard' },
-                    { label: '🗺️  Route Check',  to: '/route'     },
-                    { label: '📖  Blog',          to: '/blog'      },
-                    { label: '❓  FAQ',           to: '/faq'       },
+                    { label:'👤  Profile',      to:'/profile'   },
+                    { label:'📊  Dashboard',    to:'/dashboard' },
+                    { label:'🗺️  Route Check', to:'/route'     },
+                    { label:'📖  Blog',         to:'/blog'      },
+                    { label:'❓  FAQ',          to:'/faq'       },
                   ].map(item => (
                     <Link key={item.to} to={item.to} onClick={() => setMenuOpen(false)} style={{
-                      display: 'block', padding: '12px 18px',
-                      fontFamily: 'var(--font-cond)', fontSize: 14, color: 'var(--text)',
-                      borderBottom: '1px solid var(--border)', textDecoration: 'none',
+                      display:'block', padding:'12px 18px',
+                      fontFamily:'var(--font-cond)', fontSize:14, color:'var(--text)',
+                      borderBottom:'1px solid var(--border)', textDecoration:'none',
                     }}>{item.label}</Link>
                   ))}
                   <button onClick={handleLogout} style={{
-                    width: '100%', padding: '12px 18px', background: 'none', border: 'none',
-                    cursor: 'pointer', textAlign: 'left',
-                    fontFamily: 'var(--font-cond)', fontSize: 14, color: 'var(--red)',
+                    width:'100%', padding:'12px 18px', background:'none', border:'none',
+                    cursor:'pointer', textAlign:'left',
+                    fontFamily:'var(--font-cond)', fontSize:14, color:'var(--red)',
                   }}>🚪  Logout</button>
                 </div>
               )}
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display:'flex', gap:8 }}>
               <Link to="/login"  className="btn btn-outline btn-sm">Login</Link>
               <Link to="/signup" className="btn btn-primary btn-sm">Sign Up</Link>
             </div>
           )}
         </div>
       </div>
-      <style>{`@media(max-width:700px){.desktop-nav{display:none!important}}`}</style>
+      <style>{`
+        @media(max-width:700px){ .desktop-nav{display:none!important} .hide-mobile{display:none!important} }
+      `}</style>
     </header>
   );
 }
